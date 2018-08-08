@@ -1,8 +1,7 @@
-[![Latest Version](https://pypip.in/version/counterparty-cli/badge.svg)](https://pypi.python.org/pypi/counterparty-cli/)
-[![Supported Python versions](https://pypip.in/py_versions/counterparty-cli/badge.svg)](https://pypi.python.org/pypi/counterparty-cli/)
-[![License](https://pypip.in/license/counterparty-cli/badge.svg)](https://pypi.python.org/pypi/counterparty-cli/)
-[![Slack Status](http://slack.counterparty.io/badge.svg)](http://slack.counterparty.io)
+[![Latest Version](https://pypip.in/version/aspire-cli/badge.svg)](https://pypi.python.org/pypi/aspire-cli/)
+[![Supported Python versions](https://pypip.in/py_versions/aspire-cli/badge.svg)](https://pypi.python.org/pypi/aspire-cli/)
+[![License](https://pypip.in/license/aspire-cli/badge.svg)](https://pypi.python.org/pypi/aspire-cli/)
 
-`counterparty-cli` is a command line interface for [`counterparty-lib`](https://github.com/CounterpartyXCP/counterparty-lib).
+`aspire-cli` is a command line interface for [`aspire-lib`](https://github.com/AspireOrg/aspire-lib).
 
-For installation and configuration instructions, see the [`counterparty-lib README`](https://github.com/CounterpartyXCP/counterparty-lib), as well as the [Official Project Documentation](http://counterparty.io/docs/).
+For installation and configuration instructions, see the [`aspire-lib README`](https://github.com/AspireOrg/aspire-lib), as well as the [Project Documentation](http://counterparty.io/docs/).

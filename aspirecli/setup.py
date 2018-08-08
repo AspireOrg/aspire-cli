@@ -51,8 +51,8 @@ def generate_config_file(filename, config_args, known_config={}, overwrite=False
 def extract_old_config():
     old_config = {}
 
-    old_appdir = appdirs.user_config_dir(appauthor='Counterparty', appname='counterpartyd', roaming=True)
-    old_configfile = os.path.join(old_appdir, 'counterpartyd.conf')
+    old_appdir = appdirs.user_config_dir(appauthor='Aspire', appname='aspired', roaming=True)
+    old_configfile = os.path.join(old_appdir, 'aspired.conf')
 
     if os.path.exists(old_configfile):
         configfile = configparser.SafeConfigParser(allow_no_value=True, inline_comment_prefixes=('#', ';'))
@@ -66,19 +66,19 @@ def extract_old_config():
 
     return old_config
 
-def extract_bitcoincore_config():
-    bitcoincore_config = {}
+def extract_aspiregas_config():
+    aspiregas_config = {}
 
-    # Figure out the path to the bitcoin.conf file
+    # Figure out the path to the aspiregas.conf file
     if platform.system() == 'Darwin':
-        btc_conf_file = os.path.expanduser('~/Library/Application Support/Bitcoin/')
+        btc_conf_file = os.path.expanduser('~/Library/Application Support/AspireGas/')
     elif platform.system() == 'Windows':
-        btc_conf_file = os.path.join(os.environ['APPDATA'], 'Bitcoin')
+        btc_conf_file = os.path.join(os.environ['APPDATA'], 'AspireGas')
     else:
-        btc_conf_file = os.path.expanduser('~/.bitcoin')
-    btc_conf_file = os.path.join(btc_conf_file, 'bitcoin.conf')
+        btc_conf_file = os.path.expanduser('~/.aspiregas')
+    btc_conf_file = os.path.join(btc_conf_file, 'aspiregas.conf')
 
-    # Extract contents of bitcoin.conf to build service_url
+    # Extract contents of aspiregas.conf to build service_url
     if os.path.exists(btc_conf_file):
         conf = {}
         with open(btc_conf_file, 'r') as fd:
@@ -98,16 +98,16 @@ def extract_bitcoincore_config():
 
             for bitcoind_key in config_keys:
                 if bitcoind_key in conf:
-                    counterparty_key = config_keys[bitcoind_key]
-                    bitcoincore_config[counterparty_key] = conf[bitcoind_key]
+                    aspire_key = config_keys[bitcoind_key]
+                    aspiregas_config[aspire_key] = conf[bitcoind_key]
 
-    return bitcoincore_config
+    return aspiregas_config
 
 def get_server_known_config():
     server_known_config = {}
 
-    bitcoincore_config = extract_bitcoincore_config()
-    server_known_config.update(bitcoincore_config)
+    aspiregas_config = extract_aspiregas_config()
+    server_known_config.update(aspiregas_config)
 
     old_config = extract_old_config()
     server_known_config.update(old_config)
@@ -125,10 +125,10 @@ def server_to_client_config(server_config):
         'backend-password': 'wallet-password',
         'backend-ssl': 'wallet-ssl',
         'backend-ssl-verify': 'wallet-ssl-verify',
-        'rpc-host': 'counterparty-rpc-connect',
-        'rpc-port': 'counterparty-rpc-port',
-        'rpc-user': 'counterparty-rpc-user',
-        'rpc-password': 'counterparty-rpc-password'
+        'rpc-host': 'aspire-rpc-connect',
+        'rpc-port': 'aspire-rpc-port',
+        'rpc-user': 'aspire-rpc-user',
+        'rpc-password': 'aspire-rpc-password'
     }
 
     for server_key in config_keys:
@@ -139,9 +139,9 @@ def server_to_client_config(server_config):
     return client_config
 
 def generate_config_files():
-    from counterpartycli.server import CONFIG_ARGS as SERVER_CONFIG_ARGS
-    from counterpartycli.client import CONFIG_ARGS as CLIENT_CONFIG_ARGS
-    from counterpartylib.lib import config, util
+    from aspirecli.server import CONFIG_ARGS as SERVER_CONFIG_ARGS
+    from aspirecli.client import CONFIG_ARGS as CLIENT_CONFIG_ARGS
+    from aspirelib.lib import config, util
 
     configdir = appdirs.user_config_dir(appauthor=config.XCP_NAME, appname=config.APP_NAME, roaming=True)
 
@@ -169,8 +169,8 @@ def before_py2exe_build(win_dist_dir):
         shutil.rmtree(win_dist_dir)
     # py2exe don't manages entry_points
     for exe_name in ['client', 'server']:
-        shutil.copy('counterpartycli/__init__.py', 'counterparty-{}.py'.format(exe_name))
-        with open('counterparty-{}.py'.format(exe_name), 'a') as fp:
+        shutil.copy('aspirecli/__init__.py', 'aspire-{}.py'.format(exe_name))
+        with open('aspire-{}.py'.format(exe_name), 'a') as fp:
             fp.write('{}_main()'.format(exe_name))
     # Hack
     src = 'C:\\Python34\\Lib\\site-packages\\flask_httpauth.py'
@@ -180,11 +180,11 @@ def before_py2exe_build(win_dist_dir):
 def after_py2exe_build(win_dist_dir):
     # clean temporaries scripts
     for exe_name in ['client', 'server']:
-        os.remove('counterparty-{}.py'.format(exe_name))
+        os.remove('aspire-{}.py'.format(exe_name))
     # py2exe copies only pyc files in site-packages.zip
     # modules with no pyc files must be copied in 'dist/library/'
-    import counterpartylib, certifi
-    additionals_modules = [counterpartylib, certifi]
+    import aspirelib, certifi
+    additionals_modules = [aspirelib, certifi]
     for module in additionals_modules:
         moudle_file = os.path.dirname(module.__file__)
         dest_file = os.path.join(win_dist_dir, 'library', module.__name__)
@@ -201,9 +201,9 @@ def after_py2exe_build(win_dist_dir):
     zip_path = '{}.zip'.format(win_dist_dir)
     zip_folder(win_dist_dir, zip_path)
 
-    # Open,close, read file and calculate MD5 on its contents 
+    # Open,close, read file and calculate MD5 on its contents
     with open(zip_path, 'rb') as zip_file:
-        data = zip_file.read()    
+        data = zip_file.read()
         md5 = hashlib.md5(data).hexdigest()
 
     # include MD5 in the zip name
@@ -220,7 +220,7 @@ def after_py2exe_build(win_dist_dir):
 # Download bootstrap database
 def bootstrap(overwrite=True, ask_confirmation=False):
     if ask_confirmation:
-        question = 'Would you like to bootstrap your local Counterparty database from `https://s3.amazonaws.com/counterparty-bootstrap/`? (y/N): '
+        question = 'Would you like to bootstrap your local Aspire database from `https://s3.amazonaws.com/aspire-bootstrap/`? (y/N): '
         if input(question).lower() != 'y':
             return
     util.bootstrap(testnet=False)

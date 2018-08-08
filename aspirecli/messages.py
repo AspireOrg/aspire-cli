@@ -6,11 +6,11 @@ import time
 import calendar
 import dateutil.parser
 
-from counterpartylib.lib import script, config, blocks, exceptions, api, transaction
-from counterpartylib.lib.util import make_id, BET_TYPE_NAME, BET_TYPE_ID, dhash, generate_asset_name
-from counterpartylib.lib.kickstart.utils import ib2h
-from counterpartycli import util
-from counterpartycli import wallet
+from aspirelib.lib import script, config, blocks, exceptions, api, transaction
+from aspirelib.lib.util import make_id, BET_TYPE_NAME, BET_TYPE_ID, dhash, generate_asset_name
+from aspirelib.lib.kickstart.utils import ib2h
+from aspirecli import util
+from aspirecli import wallet
 
 import bitcoin as bitcoinlib
 
@@ -126,7 +126,7 @@ def prepare_args(args, action):
     args.regular_dust_size = int(args.regular_dust_size * config.UNIT)
     args.multisig_dust_size = int(args.multisig_dust_size * config.UNIT)
     args.op_return_value = int(args.op_return_value * config.UNIT)
-    
+
     # common
     if args.fee:
         args.fee = util.value_in(args.fee, config.BTC)
@@ -187,8 +187,8 @@ def prepare_args(args, action):
 
     # execute
     if action == 'execute':
-        args.value = util.value_in(args.value, 'XCP')
-        args.startgas = util.value_in(args.startgas, 'XCP')
+        args.value = util.value_in(args.value, config.XCP)
+        args.startgas = util.value_in(args.startgas, config.XCP)
 
     # destroy
     if action == 'destroy':
@@ -202,7 +202,7 @@ def prepare_args(args, action):
             move_random_hash_bin = dhash(random_bin + move)
             return binascii.hexlify(random_bin).decode('utf8'), binascii.hexlify(move_random_hash_bin).decode('utf8')
 
-        args.wager = util.value_in(args.wager, 'XCP')
+        args.wager = util.value_in(args.wager, config.XCP)
         random, move_random_hash = generate_move_random_hash(args.move)
         setattr(args, 'move_random_hash', move_random_hash)
         print('random: {}'.format(random))
@@ -221,7 +221,7 @@ def extract_args(args, keys):
 def get_input_value(tx_hex):
     unspents = wallet.list_unspent()
     ctx = bitcoinlib.core.CTransaction.deserialize(binascii.unhexlify(tx_hex))
-    
+
     inputs_value = 0
     for vin in ctx.vin:
         vin_tx_hash = ib2h(vin.prevout.hash)
@@ -255,7 +255,7 @@ def compose_transaction(args, message_name, param_names):
     common_params = common_args(args)
     params = extract_args(args, param_names)
     params.update(common_params)
-    
+
     # Get provided pubkeys from params.
     pubkeys = []
     for address_name in ['source', 'destination']:
@@ -267,7 +267,7 @@ def compose_transaction(args, message_name, param_names):
 
     method = 'create_{}'.format(message_name)
     unsigned_tx_hex = util.api(method, params)
-    
+
     # check_transaction(method, params, unsigned_tx_hex)
 
     return unsigned_tx_hex

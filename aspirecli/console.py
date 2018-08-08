@@ -1,6 +1,6 @@
 import os
 from prettytable import PrettyTable
-from counterpartycli import wallet, util
+from aspirecli import wallet, util
 
 # TODO: inelegant
 def get_view(view_name, args):
@@ -82,7 +82,7 @@ def print_asset(asset):
     print(os.linesep.join(lines))
 
 def print_wallet(wallet):
-    lines = [] 
+    lines = []
     for address in wallet['addresses']:
         table = PrettyTable(['Asset', 'Balance'])
         for asset in wallet['addresses'][address]:
