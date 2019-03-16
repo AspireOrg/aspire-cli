@@ -17,7 +17,7 @@ class ConfigurationError(Exception):
     pass
 
 
-def initialize(testnet=False, testcoin=False,
+def initialize(testnet=False,
                aspire_rpc_connect=None, aspire_rpc_port=None,
                aspire_rpc_user=None, aspire_rpc_password=None,
                aspire_rpc_ssl=False, aspire_rpc_ssl_verify=False,
@@ -32,9 +32,6 @@ def initialize(testnet=False, testcoin=False,
 
     # testnet
     config.TESTNET = testnet or False
-
-    # testcoin
-    config.TESTCOIN = testcoin or False
 
     ##############
     # THINGS WE CONNECT TO
@@ -83,7 +80,7 @@ def initialize(testnet=False, testcoin=False,
     config.ASPIRE_RPC += '/rpc/'
 
     # GASP Wallet name
-    config.WALLET_NAME = wallet_name or 'aspiregascore'
+    config.WALLET_NAME = wallet_name or 'bitcoincore'
 
     # GASP Wallet host
     config.WALLET_CONNECT = wallet_connect or 'localhost'
@@ -128,44 +125,21 @@ def initialize(testnet=False, testcoin=False,
     config.REQUESTS_TIMEOUT = requests_timeout
 
     # Encoding
-    if config.TESTCOIN:
-        config.PREFIX = b'XX'                   # 2 bytes (possibly accidentally created)
-    else:
-        config.PREFIX = b'CNTRPRTY'             # 8 bytes
+    config.PREFIX = b'CNTRPRTY'             # 8 bytes
 
     # (more) Testnet
     if config.TESTNET:
         config.MAGIC_BYTES = config.MAGIC_BYTES_TESTNET
-        if config.TESTCOIN:
-            config.ADDRESSVERSION = config.ADDRESSVERSION_TESTNET
-            config.P2SH_ADDRESSVERSION = config.P2SH_ADDRESSVERSION_TESTNET
-            config.BLOCK_FIRST = config.BLOCK_FIRST_TESTNET_TESTCOIN
-            config.BURN_START = config.BURN_START_TESTNET_TESTCOIN
-            config.BURN_END = config.BURN_END_TESTNET_TESTCOIN
-            config.UNSPENDABLE = config.UNSPENDABLE_TESTNET
-        else:
-            config.ADDRESSVERSION = config.ADDRESSVERSION_TESTNET
-            config.P2SH_ADDRESSVERSION = config.P2SH_ADDRESSVERSION_TESTNET
-            config.BLOCK_FIRST = config.BLOCK_FIRST_TESTNET
-            config.BURN_START = config.BURN_START_TESTNET
-            config.BURN_END = config.BURN_END_TESTNET
-            config.UNSPENDABLE = config.UNSPENDABLE_TESTNET
+        config.ADDRESSVERSION = config.ADDRESSVERSION_TESTNET
+        config.P2SH_ADDRESSVERSION = config.P2SH_ADDRESSVERSION_TESTNET
+        config.BLOCK_FIRST = config.BLOCK_FIRST_TESTNET
+        config.UNSPENDABLE = config.UNSPENDABLE_TESTNET
     else:
         config.MAGIC_BYTES = config.MAGIC_BYTES_MAINNET
-        if config.TESTCOIN:
-            config.ADDRESSVERSION = config.ADDRESSVERSION_MAINNET
-            config.P2SH_ADDRESSVERSION = config.P2SH_ADDRESSVERSION_MAINNET
-            config.BLOCK_FIRST = config.BLOCK_FIRST_MAINNET_TESTCOIN
-            config.BURN_START = config.BURN_START_MAINNET_TESTCOIN
-            config.BURN_END = config.BURN_END_MAINNET_TESTCOIN
-            config.UNSPENDABLE = config.UNSPENDABLE_MAINNET
-        else:
-            config.ADDRESSVERSION = config.ADDRESSVERSION_MAINNET
-            config.P2SH_ADDRESSVERSION = config.P2SH_ADDRESSVERSION_MAINNET
-            config.BLOCK_FIRST = config.BLOCK_FIRST_MAINNET
-            config.BURN_START = config.BURN_START_MAINNET
-            config.BURN_END = config.BURN_END_MAINNET
-            config.UNSPENDABLE = config.UNSPENDABLE_MAINNET
+        config.ADDRESSVERSION = config.ADDRESSVERSION_MAINNET
+        config.P2SH_ADDRESSVERSION = config.P2SH_ADDRESSVERSION_MAINNET
+        config.BLOCK_FIRST = config.BLOCK_FIRST_MAINNET
+        config.UNSPENDABLE = config.UNSPENDABLE_MAINNET
 
 
 WALLET_METHODS = [

@@ -22,7 +22,7 @@ MESSAGE_PARAMS = {
     'broadcast': ['source', 'fee_fraction', 'text', 'timestamp', 'value'],
     'bet': ['source', 'feed_address', 'bet_type','deadline', 'wager_quantity', 'counterwager_quantity', 'expiration', 'target_value', 'leverage'],
     'dividend': ['source', 'quantity_per_unit', 'asset', 'dividend_asset'],
-    'burn': ['source', 'quantity'],
+    'proofofwork': ['address', 'mined'],
     'cancel': ['source', 'offer_hash'],
     'rps': ['source', 'possible_moves', 'wager', 'move_random_hash', 'expiration'],
     'rpsresolve': ['source', 'random', 'move', 'rps_match_id'],
@@ -181,9 +181,9 @@ def prepare_args(args, action):
     if action == 'dividend':
         args.quantity_per_unit = util.value_in(args.quantity_per_unit, config.XCP)
 
-    # burn
-    if action == 'burn':
-        args.quantity = util.value_in(args.quantity, config.BTC)
+    # proofofwork
+    if action == 'proofofwork':
+        args.mined = util.value_in(args.mined, config.BTC)
 
     # execute
     if action == 'execute':

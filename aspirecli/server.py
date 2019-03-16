@@ -20,7 +20,6 @@ APP_NAME = 'aspire-server'
 CONFIG_ARGS = [
     [('-v', '--verbose'), {'dest': 'verbose', 'action': 'store_true', 'default': False, 'help': 'sets log level to DEBUG instead of WARNING'}],
     [('--testnet',), {'action': 'store_true', 'default': False, 'help': 'use {} testnet addresses and block numbers'.format(config.BTC_NAME)}],
-    [('--testcoin',), {'action': 'store_true', 'default': False, 'help': 'use the test {} network on every blockchain'.format(config.XCP_NAME)}],
 
     [('--backend-name',), {'default': 'addrindex', 'help': 'the backend name to connect to'}],
     [('--backend-connect',), {'default': 'localhost', 'help': 'the hostname or IP of the backend server'}],
@@ -120,7 +119,7 @@ def main():
     if args.action in COMMANDS_WITH_DB or args.action in COMMANDS_WITH_CONFIG:
         init_args = dict(database_file=args.database_file,
                          log_file=args.log_file, api_log_file=args.api_log_file,
-                         testnet=args.testnet, testcoin=args.testcoin,
+                         testnet=args.testnet,
                          backend_name=args.backend_name,
                          backend_connect=args.backend_connect,
                          backend_port=args.backend_port,
