@@ -4,23 +4,22 @@ import os
 import sys
 import argparse
 import logging
-logger = logging.getLogger()
-
-from aspirelib.lib import log
-log.set_logger(logger)
 
 from aspirelib import server
+from aspirelib.lib import log
 from aspirelib.lib import config
 from aspirecli.util import add_config_arguments, bootstrap
 from aspirecli.setup import generate_config_files
 from aspirecli import APP_VERSION
+
+logger = logging.getLogger()
+log.set_logger(logger)
 
 APP_NAME = 'aspire-server'
 
 CONFIG_ARGS = [
     [('-v', '--verbose'), {'dest': 'verbose', 'action': 'store_true', 'default': False, 'help': 'sets log level to DEBUG instead of WARNING'}],
     [('--testnet',), {'action': 'store_true', 'default': False, 'help': 'use {} testnet addresses and block numbers'.format(config.BTC_NAME)}],
-    [('--testcoin',), {'action': 'store_true', 'default': False, 'help': 'use the test {} network on every blockchain'.format(config.XCP_NAME)}],
 
     [('--backend-name',), {'default': 'addrindex', 'help': 'the backend name to connect to'}],
     [('--backend-connect',), {'default': 'localhost', 'help': 'the hostname or IP of the backend server'}],
@@ -58,7 +57,7 @@ class VersionError(Exception):
 def main():
     if os.name == 'nt':
         from aspirelib.lib import util_windows
-        #patch up cmd.exe's "challenged" (i.e. broken/non-existent) UTF-8 logging
+        # patch up cmd.exe's "challenged" (i.e. broken/non-existent) UTF-8 logging
         util_windows.fix_win32_unicode()
 
     # Post installation tasks
@@ -120,7 +119,7 @@ def main():
     if args.action in COMMANDS_WITH_DB or args.action in COMMANDS_WITH_CONFIG:
         init_args = dict(database_file=args.database_file,
                          log_file=args.log_file, api_log_file=args.api_log_file,
-                         testnet=args.testnet, testcoin=args.testcoin,
+                         testnet=args.testnet,
                          backend_name=args.backend_name,
                          backend_connect=args.backend_connect,
                          backend_port=args.backend_port,

@@ -23,7 +23,6 @@ APP_NAME = 'aspire-client'
 CONFIG_ARGS = [
     [('-v', '--verbose'), {'dest': 'verbose', 'action': 'store_true', 'help': 'sets log level to DEBUG instead of WARNING'}],
     [('--testnet',), {'action': 'store_true', 'default': False, 'help': 'use {} testnet addresses and block numbers'.format(config.BTC_NAME)}],
-    [('--testcoin',), {'action': 'store_true', 'default': False, 'help': 'use the test {} network on every blockchain'.format(config.XCP_NAME)}],
 
     [('--aspire-rpc-connect',), {'default': 'localhost', 'help': 'the hostname or IP of the Aspire JSON-RPC server'}],
     [('--aspire-rpc-port',), {'type': int, 'help': 'the port of the Aspire JSON-RPC server'}],
@@ -32,7 +31,7 @@ CONFIG_ARGS = [
     [('--aspire-rpc-ssl',), {'default': False, 'action': 'store_true', 'help': 'use SSL to connect to the Aspire server (default: false)'}],
     [('--aspire-rpc-ssl-verify',), {'default': False, 'action': 'store_true', 'help': 'verify SSL certificate of the Aspire server; disallow use of self‐signed certificates (default: false)'}],
 
-    [('--wallet-name',), {'default': 'aspiregascore', 'help': 'the wallet name to connect to'}],
+    [('--wallet-name',), {'default': 'bitcoincore', 'help': 'the wallet name to connect to'}],
     [('--wallet-connect',), {'default': 'localhost', 'help': 'the hostname or IP of the wallet server'}],
     [('--wallet-port',), {'type': int, 'help': 'the wallet port to connect to'}],
     [('--wallet-user',), {'default': 'aspiregasrpc', 'help': 'the username used to communicate with wallet'}],
@@ -134,11 +133,6 @@ def main():
     parser_dividend.add_argument('--dividend-asset', required=True, help='asset in which to pay the dividends')
     parser_dividend.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
 
-    parser_burn = subparsers.add_parser('burn', help='destroy {} to earn {}, during an initial period of time'.format(config.XCP, config.XCP))
-    parser_burn.add_argument('--source', required=True, help='the source address')
-    parser_burn.add_argument('--quantity', required=True, help='quantity of {} to be burned'.format(config.BTC))
-    parser_burn.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
-
     parser_cancel = subparsers.add_parser('cancel', help='cancel an open order or bet you created')
     parser_cancel.add_argument('--source', required=True, help='the source address')
     parser_cancel.add_argument('--offer-hash', required=True, help='the transaction hash of the order or bet')
@@ -209,7 +203,7 @@ def main():
         sys.exit()
 
     # Configuration
-    clientapi.initialize(testnet=args.testnet, testcoin=args.testcoin,
+    clientapi.initialize(testnet=args.testnet,
                         aspire_rpc_connect=args.aspire_rpc_connect, aspire_rpc_port=args.aspire_rpc_port,
                         aspire_rpc_user=args.aspire_rpc_user, aspire_rpc_password=args.aspire_rpc_password,
                         aspire_rpc_ssl=args.aspire_rpc_ssl, aspire_rpc_ssl_verify=args.aspire_rpc_ssl_verify,
