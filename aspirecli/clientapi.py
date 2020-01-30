@@ -145,7 +145,7 @@ def initialize(testnet=False,
 WALLET_METHODS = [
     'get_wallet_addresses', 'get_gasp_balances', 'sign_raw_transaction',
     'get_pubkey', 'is_valid', 'is_mine', 'get_gasp_balance', 'send_raw_transaction',
-    'wallet', 'asset', 'balances', 'pending', 'is_locked', 'unlock', 'wallet_last_block'
+    'wallet', 'asset', 'balances', 'is_locked', 'unlock', 'wallet_last_block'
 ]
 
 

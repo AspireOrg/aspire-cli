@@ -10,8 +10,6 @@ def get_view(view_name, args):
         return wallet.asset(args.asset)
     elif view_name == 'wallet':
         return wallet.wallet()
-    elif view_name == 'pending':
-        return wallet.pending()
     elif view_name == 'getinfo':
         return util.api('get_running_info')
     elif view_name == 'get_tx_info':
@@ -99,13 +97,6 @@ def print_wallet(wallet):
     lines.append(total_table.get_string())
     lines.append('')
     print(os.linesep.join(lines))
-
-def print_pending(awaiting_btcs):
-    table = PrettyTable(['Matched Order ID', 'Time Left'])
-    for order_match in awaiting_btcs:
-        order_match = format_order_match(order_match)
-        table.add_row(order_match)
-    print(table)
 
 def print_getrows(rows):
     if len(rows) > 0:

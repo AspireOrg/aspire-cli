@@ -7,7 +7,7 @@ import calendar
 import dateutil.parser
 
 from aspirelib.lib import script, config, blocks, exceptions, api, transaction
-from aspirelib.lib.util import make_id, BET_TYPE_NAME, BET_TYPE_ID, dhash, generate_asset_name
+from aspirelib.lib.util import make_id, dhash, generate_asset_name
 from aspirelib.lib.kickstart.utils import ib2h
 from aspirecli import util
 from aspirecli import wallet
@@ -16,17 +16,11 @@ import bitcoin as bitcoinlib
 
 MESSAGE_PARAMS = {
     'send': ['source', 'destination', 'asset', 'quantity', 'memo', 'memo_is_hex', 'use_enhanced_send'],
-    'order': ['source', 'give_asset', 'give_quantity', 'get_asset', 'get_quantity', 'expiration', 'fee_required', 'fee_provided'],
-    'btcpay': ['source', 'order_match_id'],
     'issuance': ['source', 'asset', 'quantity', 'divisible', 'description', 'transfer_destination'],
     'broadcast': ['source', 'fee_fraction', 'text', 'timestamp', 'value'],
-    'bet': ['source', 'feed_address', 'bet_type','deadline', 'wager_quantity', 'counterwager_quantity', 'expiration', 'target_value', 'leverage'],
     'dividend': ['source', 'quantity_per_unit', 'asset', 'dividend_asset'],
     'proofofwork': ['address', 'mined'],
-    'cancel': ['source', 'offer_hash'],
-    'rps': ['source', 'possible_moves', 'wager', 'move_random_hash', 'expiration'],
-    'rpsresolve': ['source', 'random', 'move', 'rps_match_id'],
-    'publish': ['source', 'gasprice', 'startgas', 'endowment','code_hex'],
+    'publish': ['source', 'gasprice', 'startgas', 'endowment', 'code_hex'],
     'execute': ['source', 'contract_id', 'gasprice', 'startgas', 'value', 'payload_hex'],
     'destroy': ['source', 'asset', 'quantity', 'tag']
 }
@@ -135,29 +129,6 @@ def prepare_args(args, action):
     if action == 'send':
         args.quantity = util.value_in(args.quantity, args.asset)
 
-    # order
-    if action == 'order':
-        fee_required, fee_fraction_provided = D(args.fee_fraction_required), D(args.fee_fraction_provided)
-        give_quantity, get_quantity = D(args.give_quantity), D(args.get_quantity)
-
-        # Fee argument is either fee_required or fee_provided, as necessary.
-        if args.give_asset == config.BTC:
-            args.fee_required = 0
-            fee_fraction_provided = util.value_in(fee_fraction_provided, 'fraction')
-            args.fee_provided = round(D(fee_fraction_provided) * D(give_quantity) * D(config.UNIT))
-            print('Fee provided: {} {}'.format(util.value_out(args.fee_provided, config.BTC), config.BTC))
-        elif args.get_asset == config.BTC:
-            args.fee_provided = 0
-            fee_fraction_required = util.value_in(args.fee_fraction_required, 'fraction')
-            args.fee_required = round(D(fee_fraction_required) * D(get_quantity) * D(config.UNIT))
-            print('Fee required: {} {}'.format(util.value_out(args.fee_required, config.BTC), config.BTC))
-        else:
-            args.fee_required = 0
-            args.fee_provided = 0
-
-        args.give_quantity = util.value_in(give_quantity, args.give_asset)
-        args.get_quantity = util.value_in(get_quantity, args.get_asset)
-
     # issuance
     if action == 'issuance':
         args.quantity = util.value_in(args.quantity, None, divisible=args.divisible)
@@ -167,15 +138,6 @@ def prepare_args(args, action):
         args.value = util.value_in(args.value, 'value')
         args.fee_fraction = util.value_in(args.fee_fraction, 'fraction')
         args.timestamp = int(time.time())
-
-    # bet
-    if action == 'bet':
-        args.deadline = calendar.timegm(dateutil.parser.parse(args.deadline).utctimetuple())
-        args.wager = util.value_in(args.wager, config.XCP)
-        args.counterwager = util.value_in(args.counterwager, config.XCP)
-        args.target_value = util.value_in(args.target_value, 'value')
-        args.leverage = util.value_in(args.leverage, 'leverage')
-        args.bet_type = BET_TYPE_ID[args.bet_type]
 
     # dividend
     if action == 'dividend':
@@ -193,20 +155,6 @@ def prepare_args(args, action):
     # destroy
     if action == 'destroy':
         args.quantity = util.value_in(args.quantity, args.asset, 'input')
-
-    # RPS
-    if action == 'rps':
-        def generate_move_random_hash(move):
-            move = int(move).to_bytes(2, byteorder='big')
-            random_bin = os.urandom(16)
-            move_random_hash_bin = dhash(random_bin + move)
-            return binascii.hexlify(random_bin).decode('utf8'), binascii.hexlify(move_random_hash_bin).decode('utf8')
-
-        args.wager = util.value_in(args.wager, config.XCP)
-        random, move_random_hash = generate_move_random_hash(args.move)
-        setattr(args, 'move_random_hash', move_random_hash)
-        print('random: {}'.format(random))
-        print('move_random_hash: {}'.format(move_random_hash))
 
     return args
 

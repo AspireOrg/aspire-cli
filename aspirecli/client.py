@@ -11,7 +11,7 @@ from aspirelib.lib import log
 logger = logging.getLogger(__name__)
 
 from aspirelib.lib import config, script
-from aspirelib.lib.util import make_id, BET_TYPE_NAME
+from aspirelib.lib.util import make_id
 from aspirelib.lib.log import isodt
 from aspirelib.lib.exceptions import TransactionError
 from aspirecli.util import add_config_arguments
@@ -81,23 +81,6 @@ def main():
     parser_send.add_argument('--no-use-enhanced-send', action='store_false', dest="use_enhanced_send", default=True, help='If set to false, compose a non-enhanced send with an aspiregas dust output')
     parser_send.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
 
-    parser_order = subparsers.add_parser('order', help='create and broadcast an *order* message')
-    parser_order.add_argument('--source', required=True, help='the source address')
-    parser_order.add_argument('--get-quantity', required=True, help='the quantity of GET_ASSET that you would like to receive')
-    parser_order.add_argument('--get-asset', required=True, help='the asset that you would like to buy')
-    parser_order.add_argument('--give-quantity', required=True, help='the quantity of GIVE_ASSET that you are willing to give')
-    parser_order.add_argument('--give-asset', required=True, help='the asset that you would like to sell')
-    parser_order.add_argument('--expiration', type=int, required=True, help='the number of blocks for which the order should be valid')
-    parser_order.add_argument('--fee-fraction-required', default=config.DEFAULT_FEE_FRACTION_REQUIRED, help='the miners’ fee required for an order to match this one, as a fraction of the {} to be bought'.format(config.BTC))
-    parser_order_fees = parser_order.add_mutually_exclusive_group()
-    parser_order_fees.add_argument('--fee-fraction-provided', default=config.DEFAULT_FEE_FRACTION_PROVIDED, help='the miners’ fee provided, as a fraction of the {} to be sold'.format(config.BTC))
-    parser_order_fees.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
-
-    parser_btcpay = subparsers.add_parser('{}pay'.format(config.BTC).lower(), help='create and broadcast a *{}pay* message, to settle an Order Match for which you owe {}'.format(config.BTC, config.BTC))
-    parser_btcpay.add_argument('--source', required=True, help='the source address')
-    parser_btcpay.add_argument('--order-match-id', required=True, help='the concatenation of the hashes of the two transactions which compose the order match')
-    parser_btcpay.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
-
     parser_issuance = subparsers.add_parser('issuance', help='issue a new asset, issue more of an existing asset or transfer the ownership of an asset')
     parser_issuance.add_argument('--source', required=True, help='the source address')
     parser_issuance.add_argument('--transfer-destination', help='for transfer of ownership of asset issuance rights')
@@ -111,20 +94,7 @@ def main():
     parser_broadcast.add_argument('--source', required=True, help='the source address')
     parser_broadcast.add_argument('--text', type=str, required=True, help='the textual part of the broadcast (set to ‘LOCK’ to lock feed)')
     parser_broadcast.add_argument('--value', type=float, default=-1, help='numerical value of the broadcast')
-    parser_broadcast.add_argument('--fee-fraction', default=0, help='the fraction of bets on this feed that go to its operator')
     parser_broadcast.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
-
-    parser_bet = subparsers.add_parser('bet', help='offer to make a bet on the value of a feed')
-    parser_bet.add_argument('--source', required=True, help='the source address')
-    parser_bet.add_argument('--feed-address', required=True, help='the address which publishes the feed to bet on')
-    parser_bet.add_argument('--bet-type', choices=list(BET_TYPE_NAME.values()), required=True, help='choices: {}'.format(list(BET_TYPE_NAME.values())))
-    parser_bet.add_argument('--deadline', required=True, help='the date and time at which the bet should be decided/settled')
-    parser_bet.add_argument('--wager', required=True, help='the quantity of {} to wager'.format(config.XCP))
-    parser_bet.add_argument('--counterwager', required=True, help='the minimum quantity of {} to be wagered by the user to bet against you, if he were to accept the whole thing'.format(config.XCP))
-    parser_bet.add_argument('--target-value', default=0.0, help='target value for Equal/NotEqual bet')
-    parser_bet.add_argument('--leverage', type=int, default=5040, help='leverage, as a fraction of 5040')
-    parser_bet.add_argument('--expiration', type=int, required=True, help='the number of blocks for which the bet should be valid')
-    parser_bet.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
 
     parser_dividend = subparsers.add_parser('dividend', help='pay dividends to the holders of an asset (in proportion to their stake in it)')
     parser_dividend.add_argument('--source', required=True, help='the source address')
@@ -132,11 +102,6 @@ def main():
     parser_dividend.add_argument('--asset', required=True, help='the asset to which pay dividends')
     parser_dividend.add_argument('--dividend-asset', required=True, help='asset in which to pay the dividends')
     parser_dividend.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
-
-    parser_cancel = subparsers.add_parser('cancel', help='cancel an open order or bet you created')
-    parser_cancel.add_argument('--source', required=True, help='the source address')
-    parser_cancel.add_argument('--offer-hash', required=True, help='the transaction hash of the order or bet')
-    parser_cancel.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
 
     parser_publish = subparsers.add_parser('publish', help='publish contract code in the blockchain')
     parser_publish.add_argument('--source', required=True, help='the source address')
@@ -169,8 +134,6 @@ def main():
     parser_asset.add_argument('asset', help='the asset you are interested in')
 
     parser_wallet = subparsers.add_parser('wallet', help='list the addresses in your backend wallet along with their balances in all {} assets'.format(config.XCP_NAME))
-
-    parser_pending = subparsers.add_parser('pending', help='list pending order matches awaiting {}payment from you'.format(config.BTC))
 
     parser_getrows = subparsers.add_parser('getrows', help='get rows from an Aspire table')
     parser_getrows.add_argument('--table', required=True, help='table name')
@@ -240,7 +203,7 @@ def main():
 
 
     # VIEWING
-    elif args.action in ['balances', 'asset', 'wallet', 'pending', 'getinfo', 'getrows', 'get_tx_info']:
+    elif args.action in ['balances', 'asset', 'wallet', 'getinfo', 'getrows', 'get_tx_info']:
         view = console.get_view(args.action, args)
         print_method = getattr(console, 'print_{}'.format(args.action), None)
         if args.json_output or print_method is None:
