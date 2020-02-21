@@ -4,16 +4,16 @@ import os
 import sys
 import argparse
 import logging
+logger = logging.getLogger()
+
+from aspirelib.lib import log
+log.set_logger(logger)
 
 from aspirelib import server
-from aspirelib.lib import log
 from aspirelib.lib import config
 from aspirecli.util import add_config_arguments, bootstrap
 from aspirecli.setup import generate_config_files
 from aspirecli import APP_VERSION
-
-logger = logging.getLogger()
-log.set_logger(logger)
 
 APP_NAME = 'aspire-server'
 
