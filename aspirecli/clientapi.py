@@ -101,7 +101,7 @@ def initialize(testnet=False,
         raise ConfigurationError("Please specific a valid port number wallet-port configuration parameter")
 
     # GASP Wallet user
-    config.WALLET_USER = wallet_user or 'aspiregasrpc'
+    config.WALLET_USER = wallet_user or 'gasprpc'
 
     # GASP Wallet password
     if wallet_password:

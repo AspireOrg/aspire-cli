@@ -24,7 +24,7 @@ CONFIG_ARGS = [
     [('--backend-name',), {'default': 'addrindex', 'help': 'the backend name to connect to'}],
     [('--backend-connect',), {'default': 'localhost', 'help': 'the hostname or IP of the backend server'}],
     [('--backend-port',), {'type': int, 'help': 'the backend port to connect to'}],
-    [('--backend-user',), {'default': 'aspiregasrpc', 'help': 'the username used to communicate with backend'}],
+    [('--backend-user',), {'default': 'gasprpc', 'help': 'the username used to communicate with backend'}],
     [('--backend-password',), {'help': 'the password used to communicate with backend'}],
     [('--backend-ssl',), {'action': 'store_true', 'default': False, 'help': 'use SSL to connect to backend (default: false)'}],
     [('--backend-ssl-no-verify',), {'action': 'store_true', 'default': False, 'help': 'verify SSL certificate of backend; disallow use of self‐signed certificates (default: true)'}],
@@ -83,7 +83,7 @@ def main():
     parser_rollback.add_argument('block_index', type=int, help='the index of the last known good block')
 
     parser_kickstart = subparsers.add_parser('kickstart', help='rapidly build database by reading from AspireGas Core blockchain')
-    parser_kickstart.add_argument('--aspiregasd-dir', help='AspireGas Core data directory')
+    parser_kickstart.add_argument('--gaspd-dir', help='AspireGas Core data directory')
 
     parser_bootstrap = subparsers.add_parser('bootstrap', help='bootstrap database with hosted snapshot')
     parser_bootstrap.add_argument('-q', '--quiet', dest='quiet', action='store_true', help='suppress progress bar')
@@ -153,7 +153,7 @@ def main():
         server.reparse(db, block_index=args.block_index)
 
     elif args.action == 'kickstart':
-        server.kickstart(db, aspiregasd_dir=args.aspiregasd_dir)
+        server.kickstart(db, gaspd_dir=args.gaspd_dir)
 
     elif args.action == 'start':
         server.start_all(db)

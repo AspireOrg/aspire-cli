@@ -8,7 +8,7 @@ from aspirecli import APP_VERSION
 
 
 class generate_configuration_files(Command):
-    description = "Generate configfiles from old files or aspiregasd config file"
+    description = "Generate configfiles from old files or gaspd config file"
     user_options = []
 
     def initialize_options(self):
@@ -57,7 +57,7 @@ setup_options = {
     'license': 'MIT',
     'description': 'Aspire Protocol Command-Line Interface',
     'long_description': '',
-    'keywords': 'aspire,aspiregas',
+    'keywords': 'aspire,gasp',
     'classifiers': [
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
