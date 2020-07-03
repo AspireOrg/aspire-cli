@@ -125,7 +125,7 @@ def initialize(testnet=False,
     config.REQUESTS_TIMEOUT = requests_timeout
 
     # Encoding
-    config.PREFIX = b'CNTRPRTY'             # 8 bytes
+    config.PREFIX = b'ASPR'             # 4 bytes
 
     # (more) Testnet
     if config.TESTNET:
