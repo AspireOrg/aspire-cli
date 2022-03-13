@@ -4,10 +4,10 @@ from setuptools import setup, find_packages, Command
 import os, sys
 import shutil
 import ctypes.util
-from counterpartycli import APP_VERSION
+from aspirecli import APP_VERSION
 
 class generate_configuration_files(Command):
-    description = "Generate configfiles from old files or bitcoind config file"
+    description = "Generate configfiles from old files or gaspd config file"
     user_options = []
 
     def initialize_options(self):
@@ -16,11 +16,11 @@ class generate_configuration_files(Command):
         pass
 
     def run(self):
-        from counterpartycli.setup import generate_config_files
+        from aspirecli.setup import generate_config_files
         generate_config_files()
 
 class install(_install):
-    description = "Install counterparty-cli and dependencies"
+    description = "Install aspire-cli and dependencies"
 
     def run(self):
         caller = sys._getframe(2)
@@ -39,21 +39,21 @@ required_packages = [
     'colorlog==2.7.0',
     'python-dateutil==2.5.3',
     'requests>=2.20.0',
-    'counterparty-lib'
+    'aspire-lib'
 ]
 
 setup_options = {
-    'name': 'counterparty-cli',
+    'name': 'aspire-cli',
     'version': APP_VERSION,
-    'author': 'Counterparty Developers',
-    'author_email': 'dev@counterparty.io',
-    'maintainer': 'Counterparty Developers',
-    'maintainer_email': 'dev@counterparty.io',
-    'url': 'http://counterparty.io',
+    'author': 'Aspire Developers',
+    'author_email': 'admin@aspirecrypto.com',
+    'maintainer': 'Aspire Developers',
+    'maintainer_email': 'admin@aspirecrypto.com',
+    'url': 'http://aspirecrypto.com',
     'license': 'MIT',
-    'description': 'Counterparty Protocol Command-Line Interface',
+    'description': 'Aspire Protocol Command-Line Interface',
     'long_description': '',
-    'keywords': 'counterparty,bitcoin',
+    'keywords': 'aspire,gasp',
     'classifiers': [
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
@@ -68,16 +68,16 @@ setup_options = {
         "Topic :: Office/Business :: Financial",
         "Topic :: System :: Distributed Computing"
     ],
-    'download_url': 'https://github.com/CounterpartyXCP/counterparty-cli/releases/tag/' + APP_VERSION,
-    'provides': ['counterpartycli'],
+    'download_url': 'https://github.com/AspireOrg/aspire-cli/releases/tag/' + APP_VERSION,
+    'provides': ['aspirecli'],
     'packages': find_packages(),
     'zip_safe': False,
     'setup_requires': ['setuptools-markdown',],
     'install_requires': required_packages,
     'entry_points': {
         'console_scripts': [
-            'counterparty-client = counterpartycli:client_main',
-            'counterparty-server = counterpartycli:server_main',
+            'aspire-client = aspirecli:client_main',
+            'aspire-server = aspirecli:server_main',
         ]
     },
     'cmdclass': {
@@ -90,11 +90,11 @@ if sys.argv[1] == 'py2exe':
     import py2exe
     from py2exe.distutils_buildexe import py2exe as _py2exe
 
-    WIN_DIST_DIR = 'counterparty-cli-win32-{}'.format(APP_VERSION)
+    WIN_DIST_DIR = 'aspire-cli-win32-{}'.format(APP_VERSION)
 
     class py2exe(_py2exe):
         def run(self):
-            from counterpartycli.setup import before_py2exe_build, after_py2exe_build
+            from aspirecli.setup import before_py2exe_build, after_py2exe_build
             # prepare build
             before_py2exe_build(WIN_DIST_DIR)
             # build exe's
@@ -105,8 +105,8 @@ if sys.argv[1] == 'py2exe':
     # Update setup_options with py2exe specifics options
     setup_options.update({
         'console': [
-            'counterparty-client.py',
-            'counterparty-server.py'
+            'aspire-client.py',
+            'aspire-server.py'
         ],
         'zipfile': 'library/site-packages.zip',
         'options': {

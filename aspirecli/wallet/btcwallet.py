@@ -6,8 +6,8 @@ import json
 import time
 import requests
 
-from counterpartylib.lib import config
-from counterpartycli.util import wallet_api as rpc
+from aspirelib.lib import config
+from aspirecli.util import wallet_api as rpc
 
 def get_wallet_addresses():
     addresses = []
@@ -16,7 +16,7 @@ def get_wallet_addresses():
             addresses.append(output['address'])
     return addresses
 
-def get_btc_balances():
+def get_gasp_balances():
     addresses = {}
     for output in rpc('listunspent', [0, 99999]):
         if output['address'] not in addresses:
@@ -51,7 +51,7 @@ def get_pubkey(address):
         return address_infos['pubkey']
     return None
 
-def get_btc_balance(address):
+def get_gasp_balance(address):
     balance = 0
     for output in rpc('listunspent', [0, 99999]):
         if output['address'] == address:

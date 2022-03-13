@@ -6,11 +6,11 @@ import time
 import calendar
 import dateutil.parser
 
-from counterpartylib.lib import script, config, blocks, exceptions, api, transaction
-from counterpartylib.lib.util import make_id, BET_TYPE_NAME, BET_TYPE_ID, dhash, generate_asset_name
-from counterpartylib.lib.kickstart.utils import ib2h
-from counterpartycli import util
-from counterpartycli import wallet
+from aspirelib.lib import script, config, blocks, exceptions, api, transaction
+from aspirelib.lib.util import make_id, BET_TYPE_NAME, BET_TYPE_ID, dhash, generate_asset_name
+from aspirelib.lib.kickstart.utils import ib2h
+from aspirecli import util
+from aspirecli import wallet
 
 import bitcoin as bitcoinlib
 
@@ -24,6 +24,7 @@ MESSAGE_PARAMS = {
     'broadcast': ['source', 'fee_fraction', 'text', 'timestamp', 'value'],
     'bet': ['source', 'feed_address', 'bet_type','deadline', 'wager_quantity', 'counterwager_quantity', 'expiration', 'target_value', 'leverage'],
     'dividend': ['source', 'quantity_per_unit', 'asset', 'dividend_asset'],
+    'proofofwork': ['address', 'mined'],
     'burn': ['source', 'quantity'],
     'cancel': ['source', 'offer_hash'],
     'rps': ['source', 'possible_moves', 'wager', 'move_random_hash', 'expiration'],
@@ -198,10 +199,14 @@ def prepare_args(args, action):
     if action == 'burn':
         args.quantity = util.value_in(args.quantity, config.BTC)
 
+    # proofofwork
+    if action == 'proofofwork':
+        args.mined = util.value_in(args.mined, config.BTC)
+
     # execute
     if action == 'execute':
-        args.value = util.value_in(args.value, 'XCP')
-        args.startgas = util.value_in(args.startgas, 'XCP')
+        args.value = util.value_in(args.value, config.XCP)
+        args.startgas = util.value_in(args.startgas, config.XCP)
 
     # destroy
     if action == 'destroy':

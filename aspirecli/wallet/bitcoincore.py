@@ -6,8 +6,8 @@ import json
 import time
 import requests
 
-from counterpartylib.lib import config
-from counterpartycli.util import wallet_api as rpc
+from aspirelib.lib import config
+from aspirecli.util import wallet_api as rpc
 
 def get_wallet_addresses():
     addresses = []
@@ -17,7 +17,7 @@ def get_wallet_addresses():
             addresses.append(address)
     return addresses
 
-def get_btc_balances():
+def get_gasp_balances():
     for group in rpc('listaddressgroupings', []):
         for bunch in group:
             yield bunch[:2]
@@ -26,22 +26,21 @@ def list_unspent():
     return rpc('listunspent', [0, 99999])
 
 def sign_raw_transaction(tx_hex):
-    return rpc('signrawtransactionwithwallet', [tx_hex])['hex']
+    return rpc('signrawtransaction', [tx_hex])['hex']
 
 def is_valid(address):
     return rpc('validateaddress', [address])['isvalid']
 
 def is_mine(address):
-    return rpc('getaddressinfo', [address])['ismine']
+    return rpc('validateaddress', [address])['ismine']
 
 def get_pubkey(address):
-    address_valid = rpc('validateaddress', [address])
-    address_infos = rpc('getaddressinfo', [address])
-    if address_valid['isvalid'] and address_infos['ismine']:
+    address_infos = rpc('validateaddress', [address])
+    if address_infos['isvalid'] and address_infos['ismine']:
         return address_infos['pubkey']
     return None
 
-def get_btc_balance(address):
+def get_gasp_balance(address):
     for group in rpc('listaddressgroupings', []):
         for bunch in group:
             btc_address, btc_balance = bunch[:2]
@@ -50,7 +49,7 @@ def get_btc_balance(address):
     return 0
 
 def is_locked():
-    getinfo = rpc('getwalletinfo', [])
+    getinfo = rpc('getinfo', [])
     if 'unlocked_until' in getinfo:
         if getinfo['unlocked_until'] >= 10:
             return False # Wallet is unlocked for at least the next 10 seconds.

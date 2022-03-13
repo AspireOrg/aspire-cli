@@ -7,37 +7,34 @@ import logging
 import getpass
 from decimal import Decimal as D
 
-from counterpartylib.lib import log
+from aspirelib.lib import log
 logger = logging.getLogger(__name__)
 
-from counterpartylib.lib import config, script
-from counterpartylib.lib.util import make_id, BET_TYPE_NAME
-from counterpartylib.lib.log import isodt
-from counterpartylib.lib.exceptions import TransactionError
-from counterpartycli.util import add_config_arguments
-from counterpartycli.setup import generate_config_files
-from counterpartycli import APP_VERSION, util, messages, wallet, console, clientapi
+from aspirelib.lib import config, script
+from aspirelib.lib.util import make_id, BET_TYPE_NAME
+from aspirelib.lib.log import isodt
+from aspirelib.lib.exceptions import TransactionError
+from aspirecli.util import add_config_arguments
+from aspirecli.setup import generate_config_files
+from aspirecli import APP_VERSION, util, messages, wallet, console, clientapi
 
-APP_NAME = 'counterparty-client'
+APP_NAME = 'aspire-client'
 
 CONFIG_ARGS = [
     [('-v', '--verbose'), {'dest': 'verbose', 'action': 'store_true', 'help': 'sets log level to DEBUG instead of WARNING'}],
     [('--testnet',), {'action': 'store_true', 'default': False, 'help': 'use {} testnet addresses and block numbers'.format(config.BTC_NAME)}],
-    [('--testcoin',), {'action': 'store_true', 'default': False, 'help': 'use the test {} network on every blockchain'.format(config.XCP_NAME)}],
-    [('--regtest',), {'action': 'store_true', 'default': False, 'help': 'use {} regtest addresses and block numbers'.format(config.BTC_NAME)}],
-    [('--customnet',), {'default': '', 'help': 'use a custom network (specify as UNSPENDABLE_ADDRESS|ADDRESSVERSION|P2SH_ADDRESSVERSION with version bytes in HH hex format)'}],
 
-    [('--counterparty-rpc-connect',), {'default': 'localhost', 'help': 'the hostname or IP of the Counterparty JSON-RPC server'}],
-    [('--counterparty-rpc-port',), {'type': int, 'help': 'the port of the Counterparty JSON-RPC server'}],
-    [('--counterparty-rpc-user',), {'default': 'rpc', 'help': 'the username for the Counterparty JSON-RPC server'}],
-    [('--counterparty-rpc-password',), {'help': 'the password for the Counterparty JSON-RPC server'}],
-    [('--counterparty-rpc-ssl',), {'default': False, 'action': 'store_true', 'help': 'use SSL to connect to the Counterparty server (default: false)'}],
-    [('--counterparty-rpc-ssl-verify',), {'default': False, 'action': 'store_true', 'help': 'verify SSL certificate of the Counterparty server; disallow use of self‐signed certificates (default: false)'}],
+    [('--aspire-rpc-connect',), {'default': 'localhost', 'help': 'the hostname or IP of the Aspire JSON-RPC server'}],
+    [('--aspire-rpc-port',), {'type': int, 'help': 'the port of the Aspire JSON-RPC server'}],
+    [('--aspire-rpc-user',), {'default': 'rpc', 'help': 'the username for the Aspire JSON-RPC server'}],
+    [('--aspire-rpc-password',), {'help': 'the password for the Aspire JSON-RPC server'}],
+    [('--aspire-rpc-ssl',), {'default': False, 'action': 'store_true', 'help': 'use SSL to connect to the Aspire server (default: false)'}],
+    [('--aspire-rpc-ssl-verify',), {'default': False, 'action': 'store_true', 'help': 'verify SSL certificate of the Aspire server; disallow use of self‐signed certificates (default: false)'}],
 
     [('--wallet-name',), {'default': 'bitcoincore', 'help': 'the wallet name to connect to'}],
     [('--wallet-connect',), {'default': 'localhost', 'help': 'the hostname or IP of the wallet server'}],
     [('--wallet-port',), {'type': int, 'help': 'the wallet port to connect to'}],
-    [('--wallet-user',), {'default': 'bitcoinrpc', 'help': 'the username used to communicate with wallet'}],
+    [('--wallet-user',), {'default': 'gasprpc', 'help': 'the username used to communicate with wallet'}],
     [('--wallet-password',), {'help': 'the password used to communicate with wallet'}],
     [('--wallet-ssl',), {'action': 'store_true', 'default': False, 'help': 'use SSL to connect to wallet (default: false)'}],
     [('--wallet-ssl-verify',), {'action': 'store_true', 'default': False, 'help': 'verify SSL certificate of wallet; disallow use of self‐signed certificates (default: false)'}],
@@ -57,7 +54,7 @@ CONFIG_ARGS = [
 
 def main():
     if os.name == 'nt':
-        from counterpartylib.lib import util_windows
+        from aspirelib.lib import util_windows
         #patch up cmd.exe's "challenged" (i.e. broken/non-existent) UTF-8 logging
         util_windows.fix_win32_unicode()
 
@@ -65,9 +62,9 @@ def main():
     generate_config_files()
 
     # Parse command-line arguments.
-    parser = argparse.ArgumentParser(prog=APP_NAME, description='Counterparty CLI for counterparty-server', add_help=False)
+    parser = argparse.ArgumentParser(prog=APP_NAME, description='Aspire CLI for aspire-server', add_help=False)
     parser.add_argument('-h', '--help', dest='help', action='store_true', help='show this help message and exit')
-    parser.add_argument('-V', '--version', action='version', version="{} v{}; {} v{}".format(APP_NAME, APP_VERSION, 'counterparty-lib', config.VERSION_STRING))
+    parser.add_argument('-V', '--version', action='version', version="{} v{}; {} v{}".format(APP_NAME, APP_VERSION, 'aspire-lib', config.VERSION_STRING))
     parser.add_argument('--config-file', help='the location of the configuration file')
 
     add_config_arguments(parser, CONFIG_ARGS, 'client.conf')
@@ -81,7 +78,7 @@ def main():
     parser_send.add_argument('--asset', required=True, help='the ASSET of which you would like to send QUANTITY')
     parser_send.add_argument('--memo', help='A transaction memo attached to this send')
     parser_send.add_argument('--memo-is-hex', action='store_true', default=False, help='Whether to interpret memo as a hexadecimal value')
-    parser_send.add_argument('--no-use-enhanced-send', action='store_false', dest="use_enhanced_send", default=True, help='If set to false, compose a non-enhanced send with a bitcoin dust output')
+    parser_send.add_argument('--no-use-enhanced-send', action='store_false', dest="use_enhanced_send", default=True, help='If set to false, compose a non-enhanced send with an gasp dust output')
     parser_send.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
 
     parser_sweep = subparsers.add_parser('sweep', help='create and broadcast a *sweep* message')
@@ -148,7 +145,7 @@ def main():
 
     parser_dividend = subparsers.add_parser('dividend', help='pay dividends to the holders of an asset (in proportion to their stake in it)')
     parser_dividend.add_argument('--source', required=True, help='the source address')
-    parser_dividend.add_argument('--quantity-per-unit', required=True, help='the quantity of XCP to be paid per whole unit held of ASSET')
+    parser_dividend.add_argument('--quantity-per-unit', required=True, help='the quantity of {} to be paid per whole unit held of ASSET'.format(config.XCP))
     parser_dividend.add_argument('--asset', required=True, help='the asset to which pay dividends')
     parser_dividend.add_argument('--dividend-asset', required=True, help='asset in which to pay the dividends')
     parser_dividend.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
@@ -180,7 +177,7 @@ def main():
     parser_execute.add_argument('--payload-hex', required=True, type=str, help='data to be provided to the contract (returned by `serpent encode_datalist`)')
     parser_execute.add_argument('--fee', help='the exact {} fee to be paid to miners'.format(config.BTC))
 
-    parser_destroy = subparsers.add_parser('destroy', help='destroy a quantity of a Counterparty asset')
+    parser_destroy = subparsers.add_parser('destroy', help='destroy a quantity of an Aspire asset')
     parser_destroy.add_argument('--source', required=True, help='the source address')
     parser_destroy.add_argument('--asset', required=True, help='the ASSET of which you would like to destroy QUANTITY')
     parser_destroy.add_argument('--quantity', required=True, help='the quantity of ASSET to destroy')
@@ -197,7 +194,7 @@ def main():
 
     parser_pending = subparsers.add_parser('pending', help='list pending order matches awaiting {}payment from you'.format(config.BTC))
 
-    parser_getrows = subparsers.add_parser('getrows', help='get rows from a Counterparty table')
+    parser_getrows = subparsers.add_parser('getrows', help='get rows from a aspire table')
     parser_getrows.add_argument('--table', required=True, help='table name')
     parser_getrows.add_argument('--filter', nargs=3, action='append', help='filters to get specific rows')
     parser_getrows.add_argument('--filter-op', choices=['AND', 'OR'], help='operator uses to combine filters', default='AND')
@@ -228,10 +225,10 @@ def main():
         sys.exit()
 
     # Configuration
-    clientapi.initialize(testnet=args.testnet, testcoin=args.testcoin, regtest=args.regtest, customnet=args.customnet,
-                        counterparty_rpc_connect=args.counterparty_rpc_connect, counterparty_rpc_port=args.counterparty_rpc_port,
-                        counterparty_rpc_user=args.counterparty_rpc_user, counterparty_rpc_password=args.counterparty_rpc_password,
-                        counterparty_rpc_ssl=args.counterparty_rpc_ssl, counterparty_rpc_ssl_verify=args.counterparty_rpc_ssl_verify,
+    clientapi.initialize(testnet=args.testnet,
+                        aspire_rpc_connect=args.aspire_rpc_connect, aspire_rpc_port=args.aspire_rpc_port,
+                        aspire_rpc_user=args.aspire_rpc_user, aspire_rpc_password=args.aspire_rpc_password,
+                        aspire_rpc_ssl=args.aspire_rpc_ssl, aspire_rpc_ssl_verify=args.aspire_rpc_ssl_verify,
                         wallet_name=args.wallet_name, wallet_connect=args.wallet_connect, wallet_port=args.wallet_port,
                         wallet_user=args.wallet_user, wallet_password=args.wallet_password,
                         wallet_ssl=args.wallet_ssl, wallet_ssl_verify=args.wallet_ssl_verify,
