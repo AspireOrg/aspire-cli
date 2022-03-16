@@ -204,4 +204,15 @@ def balances(address):
         result[asset] =  balance
     return result
 
+def pending():
+    addresses = []
+    for bunch in get_gasp_balances():
+        addresses.append(bunch[0])
+    filters = [
+        ('tx0_address', 'IN', addresses),
+        ('tx1_address', 'IN', addresses)
+    ]
+    awaiting_btcs = api('get_order_matches', {'filters': filters, 'filterop': 'OR', 'status': 'pending'})
+    return awaiting_btcs
+
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
